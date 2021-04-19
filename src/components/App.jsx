@@ -1,20 +1,41 @@
 import exampleVideoData from '../data/exampleVideoData.js';
 import Search from './Search.js';
+import searchYouTube from '../lib/searchYouTube.js';
 import VideoPlayer from './VideoPlayer.js';
 import VideoList from './VideoList.js';
+
+// videos: exampleVideoData,
+// current: exampleVideoData[0]
+// videos: [],
+// current: null
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      videos: exampleVideoData,
+      videos: [],
       current: exampleVideoData[0]
     };
+
     this.addMovie = this.addMovie.bind(this);
   }
 
+  componentDidMount() {
+    this.getYouTubeVideos('cute kittens');
+  }
+
+  getYouTubeVideos(query) {
+    console.log('query: ', query);
+    searchYouTube(query, (videos) => {
+      this.setState({
+        videos: videos,
+        current: videos[0]
+      });
+    });
+  }
+
   addMovie(movie) {
-    console.log(movie);
+    // console.log(movie);
     this.setState({current: movie});
   }
 
@@ -22,24 +43,28 @@ class App extends React.Component {
     return (
       <div>
         <nav className="navbar">
-          <div className="col-mid-6 offset-md-3" >
-            <div><h5><em>search</em><Search /></h5></div>
+          <div className="row">
+            <div className="col-mid-6 offset-md-3" >
+              <Search handleSearchInputChange={this.getYouTubeVideos.bind(this)}
+              />
+            </div>
           </div>
         </nav>
 
         <div className="row">
 
           <div className="col-md-7">
-            <div><h5><em>videoPlayer</em><VideoPlayer video={this.state.current}/></h5></div>
+            <VideoPlayer video={this.state.current}/>
           </div>
 
           <div className="col-md-5">
-            <div><h5><em>videoList</em>
-              <VideoList videos={this.state.videos}
-                addMovie={this.addMovie} /></h5></div>
+            <VideoList videos={this.state.videos}
+              addMovie={this.addMovie}
+            />
           </div>
 
         </div>
+
       </div>
     );
   }
